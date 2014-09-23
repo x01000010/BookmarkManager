@@ -127,8 +127,7 @@ namespace BookmarkManager
         private void button2_Click(object sender, EventArgs e)
         {
             int count = 0;
-            XElement x = __nestDLinDT(_bookmarks);
-            XElement y = null;
+            XElement x = __nestDLinDT(_bookmarks);            
             string name = "bookmarks";
             foreach (XElement element in x.Elements())
             {
