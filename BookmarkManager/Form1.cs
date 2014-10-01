@@ -216,6 +216,8 @@ namespace BookmarkManager
                 toolStripStatusLabel1.Text = "Writing to the grid";
                 statusStrip1.Refresh();
                 __writeToGrid();
+                toolStripStatusLabel1.Text = string.Empty;
+                statusStrip1.Refresh();
             }
         }
     }
