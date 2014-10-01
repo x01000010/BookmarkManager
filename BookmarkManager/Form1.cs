@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
@@ -25,7 +24,7 @@ namespace BookmarkManager
 <H1>Bookmarks</H1>
 <DL><p>";
 
-                private List<BookmarkObject> _files = new List<BookmarkObject>();
+        private List<BookmarkObject> _files = new List<BookmarkObject>();
 
         public Form1()
         {
@@ -36,6 +35,7 @@ namespace BookmarkManager
         {
             //need to fix incoming text
             //&#58;
+            //&#39;
             //&gt;
             //&quot;
 
@@ -136,13 +136,7 @@ namespace BookmarkManager
             idx = noHeader.LastIndexOf("</DL><p>");
             noHeader = noHeader.Substring(0, idx);
             return noHeader;
-        
-            
         }
-
-
-        
-
 
         private void __writeToFile(SortableBindingList<BookmarkObject> sbl)
         {
@@ -196,22 +190,18 @@ namespace BookmarkManager
                 {
                     try
                     {
-                        toolStripStatusLabel1.Text= string.Format("Loading {0}", fileName);
+                        toolStripStatusLabel1.Text = string.Format("Loading {0}", fileName);
                         statusStrip1.Refresh();
                         string file = File.ReadAllText(fileName);
                         file = __stripNetscapeHeader(file);
                         XElement bookmarks = __changeToXML(file);
                         __readBookmarks(bookmarks);
                     }
-                    catch (Exception ex) {
+                    catch (Exception ex)
+                    {
                         Console.WriteLine(DateTime.Now + ex.Message + fileName);
-
-                        
                     }
-
                 }
-
-
 
                 toolStripStatusLabel1.Text = "Writing to the grid";
                 statusStrip1.Refresh();
