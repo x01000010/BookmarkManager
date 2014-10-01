@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
@@ -14,6 +15,7 @@ namespace BookmarkManager
         private static XName _href = "HREF";
         private static XName _icon = "ICON";
         private static XName _lastModified = "LAST_MODIFIED";
+
         private static string _startOfFile = @"<!DOCTYPE NETSCAPE-Bookmark-file-1>
 <!-- This is an automatically generated file.
      It will be read and overwritten.
@@ -23,13 +25,7 @@ namespace BookmarkManager
 <H1>Bookmarks</H1>
 <DL><p>";
 
-        private XElement _bookmarks;
-        private List<BookmarkObject> _files = new List<BookmarkObject>();
-
-        public Form1()
-        {
-            InitializeComponent();
-        }
+                private List<BookmarkObject> _files = new List<BookmarkObject>();
 
         public Form1()
         {
@@ -48,29 +44,9 @@ namespace BookmarkManager
             s = s.Replace("<DL><p>", "<DL>");
             s = s.Replace("</DL><p>", "</DL></DT>");
             s = __fixAndReplaceAmp(s);
-            s = "<bookmarks>" + s + "</bookmarks>";
+            s = "<Bookmarks>" + s + "</Bookmarks>";
             root = XElement.Parse(s);
             return root;
-        }
-
-        private Dictionary<string, List<BookmarkObject>> __createDictionary(SortableBindingList<BookmarkObject> sbl)
-        {
-            Dictionary<string, List<BookmarkObject>> dict = new Dictionary<string, List<BookmarkObject>>();
-
-            foreach (BookmarkObject bo in sbl)
-            {
-                if (dict.ContainsKey(bo.Path))
-                {
-                    dict[bo.Path].Add(bo);
-                }
-                else
-                {
-                    List<BookmarkObject> l = new List<BookmarkObject>();
-                    l.Add(bo);
-                    dict.Add(bo.Path, l);
-                }
-            }
-            return dict;
         }
 
         private string __fixAndReplaceAmp(string str)
@@ -87,7 +63,7 @@ namespace BookmarkManager
         private string __getParent(XElement x)
         {
             XElement previousPrevious = x.Parent.Parent;
-            if (previousPrevious.Name == "bookmarks")
+            if (previousPrevious.Name == "Bookmarks")
             {
                 return previousPrevious.Name.ToString();
             }
@@ -102,7 +78,7 @@ namespace BookmarkManager
             string s = string.Empty;
             XElement previous = x.Parent;
             XElement previousPrevious = previous.Parent;
-            if (previousPrevious.Name == "bookmarks")
+            if (previousPrevious.Name == "Bookmarks")
             {
                 return string.Format(@"{0}\{1}", previousPrevious.Name, currentPath);
             }
@@ -111,24 +87,6 @@ namespace BookmarkManager
                 XElement previousPreviousSibling = previousPrevious.Parent.Element(_h3);
                 return __getPath(previousPreviousSibling, string.Format(@"{0}\{1}", previousPreviousSibling.Value, currentPath));
             }
-        }
-
-        private XElement __nestDLinDT(XElement root)
-        {
-            XElement newRoot = root;
-            foreach (XElement element in newRoot.Elements())
-            {
-                XElement next = element.NextNode as XElement;
-                if (next != null)
-                {
-                    if (element.Name.ToString() == "DT" && next.Name.ToString() == "DL")
-                    {
-                        element.NextNode.Remove();
-                        element.Add(next);
-                    }
-                }
-            }
-            return newRoot;
         }
 
         private void __processElement(XElement x)
@@ -142,6 +100,15 @@ namespace BookmarkManager
             bo.AddDate = (x.Attribute(_addDate) == null) ? string.Empty : x.Attribute(_addDate).Value;
             bo.LastModified = (x.Attribute(_lastModified) == null) ? string.Empty : x.Attribute(_lastModified).Value;
             _files.Add(bo);
+        }
+
+        private void __readBookmarks(XElement bookmarks)
+        {
+            XName aName = "A";
+            foreach (XElement x in bookmarks.Descendants(aName))
+            {
+                __processElement(x);
+            }
         }
 
         private void __removeDups()
@@ -163,17 +130,40 @@ namespace BookmarkManager
 
         private string __stripNetscapeHeader(string s)
         {
-            string folder = string.Empty;
+            string noHeader = string.Empty;
             int idx = s.IndexOf("<DT>");
-            folder = s.Substring(idx);
-            idx = folder.LastIndexOf("</DL><p>");
-            folder = folder.Substring(0, idx);
-            return folder;
+            noHeader = s.Substring(idx);
+            idx = noHeader.LastIndexOf("</DL><p>");
+            noHeader = noHeader.Substring(0, idx);
+            return noHeader;
+        
+            
         }
 
-        private void __writeToFile(SortableBindingList<BookmarkObject> bookmarks)
+
+        
+
+
+        private void __writeToFile(SortableBindingList<BookmarkObject> sbl)
         {
-            SortableBindingList<BookmarkObject> sbl = dataGridView1.DataSource as SortableBindingList<BookmarkObject>;
+            string output = _startOfFile;
+            FolderObject root = new FolderObject("Bookmarks", null);
+            root.IsRoot = true;
+
+            foreach (BookmarkObject bo in sbl)
+            {
+                root.Add(bo);
+            }
+
+            output += root.ToString();
+            output += _endOfFile;
+            TextBoxPop tbp = new TextBoxPop(output);
+            tbp.Show();
+        }
+
+        private void __writeToFile(List<BookmarkObject> lbo)
+        {
+            __writeToFile(new SortableBindingList<BookmarkObject>(lbo));
         }
 
         private void __writeToGrid()
@@ -181,68 +171,17 @@ namespace BookmarkManager
             dataGridView1.DataSource = new SortableBindingList<BookmarkObject>(_files);
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog ofd = new OpenFileDialog();
-
-            if (ofd.ShowDialog() == DialogResult.OK)
-            {
-                string file = File.ReadAllText(ofd.FileName);
-                file = __stripNetscapeHeader(file);
-                _bookmarks = __changeToXML(file);
-            }
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog ofd = new OpenFileDialog();
-
-            if (ofd.ShowDialog() == DialogResult.OK)
-            {
-                string file = File.ReadAllText(ofd.FileName);
-                file = __stripNetscapeHeader(file);
-                _bookmarks = __changeToXML(file);
-            }
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            XName aName = "A";
-            foreach (XElement x in _bookmarks.Descendants(aName))
-            {
-                __processElement(x);
-            }
-            __writeToGrid();
-        }
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-            richTextBox1.Clear();
-            foreach (BookmarkObject bo in _files)
-            {
-                if (bo.Name.Contains("&"))
-                {
-                    richTextBox1.AppendText(string.Format("{0}:{1}{2}", bo.Name, bo.Url, Environment.NewLine));
-                }
-            }
-        }
-
-        private void button4_Click(object sender, EventArgs e)
+        private void btn_Exit_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
-        private void button4_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        private void button5_Click(object sender, EventArgs e)
+        private void btn_RemoveDups_Click(object sender, EventArgs e)
         {
             __removeDups();
         }
 
-        private void button6_Click(object sender, EventArgs e)
+        private void btn_ToFile_Click(object sender, EventArgs e)
         {
             __writeToFile(dataGridView1.DataSource as SortableBindingList<BookmarkObject>);
         }
@@ -250,12 +189,33 @@ namespace BookmarkManager
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
-
+            ofd.Multiselect = true;
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                string file = File.ReadAllText(ofd.FileName);
-                file = __stripNetscapeHeader(file);
-                _bookmarks = __changeToXML(file);
+                foreach (string fileName in ofd.FileNames)
+                {
+                    try
+                    {
+                        toolStripStatusLabel1.Text= string.Format("Loading {0}", fileName);
+                        statusStrip1.Refresh();
+                        string file = File.ReadAllText(fileName);
+                        file = __stripNetscapeHeader(file);
+                        XElement bookmarks = __changeToXML(file);
+                        __readBookmarks(bookmarks);
+                    }
+                    catch (Exception ex) {
+                        Console.WriteLine(DateTime.Now + ex.Message + fileName);
+
+                        
+                    }
+
+                }
+
+
+
+                toolStripStatusLabel1.Text = "Writing to the grid";
+                statusStrip1.Refresh();
+                __writeToGrid();
             }
         }
     }

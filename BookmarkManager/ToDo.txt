@@ -1,0 +1,8 @@
+﻿Grid
+	add
+	edit
+	delete
+bookmarks
+	check page
+	get titles
+	get icons

@@ -2,21 +2,18 @@
 
 namespace BookmarkManager
 {
-    public class BookmarkObject
+    internal class BookmarkObject
     {
         private string _addDate;
         private string _icon;
         private string _lastModified;
-        private int _level;
         private string _name;
         private string _parent;
         private string _path;
-        private string _type;
         private string _url;
 
         public BookmarkObject()
         {
-            _type = "Folder";
         }
 
         public string AddDate
@@ -37,11 +34,6 @@ namespace BookmarkManager
             set { _lastModified = value; }
         }
 
-        public int Level
-        {
-            get { return _level; }
-        }
-
         public string Name
         {
             get { return _name; }
@@ -57,26 +49,16 @@ namespace BookmarkManager
         public string Path
         {
             get { return _path; }
-            set
-            {
-                _path = value;
-                _level = _path.Length - _path.Replace(@"\", "").Length;
-            }
-        }
-
-        public string Type
-        {
-            get { return _type; }
-            set { _type = value; }
+            set { _path = value; }
         }
 
         public string Url
         {
             get { return _url; }
-            set { _url = value; _type = "URL"; }
+            set { _url = value; }
         }
 
-        public string ToString()
+        public override string ToString()
         {
             string output = string.Empty;
             string addDate = (string.IsNullOrEmpty(_addDate)) ? string.Empty : string.Format("ADD_DATE=\"{0}\" ", _addDate);
