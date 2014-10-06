@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
 namespace BookmarkManager
 {
-    public partial class Form1 : Form
+    public partial class frm_Main : Form
     {
         private static XName _addDate = "ADD_DATE";
         private static string _endOfFile = "/DL><p>";
@@ -26,7 +28,7 @@ namespace BookmarkManager
 
         private List<BookmarkObject> _files = new List<BookmarkObject>();
 
-        public Form1()
+        public frm_Main()
         {
             InitializeComponent();
         }
@@ -62,6 +64,8 @@ namespace BookmarkManager
 
         private string __getParent(XElement x)
         {
+            
+            //maybe use path to get this instead
             XElement previousPrevious = x.Parent.Parent;
             if (previousPrevious.Name == "Bookmarks")
             {
@@ -96,7 +100,11 @@ namespace BookmarkManager
             bo.Path = __getPath(x, string.Empty);
             bo.Parent = __getParent(x);
             bo.Url = (x.Attribute(_href) == null) ? string.Empty : x.Attribute(_href).Value;
-            bo.Icon = (x.Attribute(_icon) == null) ? string.Empty : x.Attribute(_icon).Value;
+            XAttribute iconString = x.Attribute(_icon);
+            bo.IconString = (x.Attribute(_icon) == null) ? string.Empty : x.Attribute(_icon).Value;
+
+            
+
             bo.AddDate = (x.Attribute(_addDate) == null) ? string.Empty : x.Attribute(_addDate).Value;
             bo.LastModified = (x.Attribute(_lastModified) == null) ? string.Empty : x.Attribute(_lastModified).Value;
             _files.Add(bo);
@@ -125,7 +133,8 @@ namespace BookmarkManager
                     noDups.Add(bo);
                 }
             }
-            dataGridView1.DataSource = new SortableBindingList<BookmarkObject>(noDups);
+            _files = noDups;
+            __writeToGrid();
         }
 
         private string __stripNetscapeHeader(string s)
@@ -162,7 +171,12 @@ namespace BookmarkManager
 
         private void __writeToGrid()
         {
+            tssl_Status.Text = "Writing to Grid";
+            statusStrip1.Refresh();
             dataGridView1.DataSource = new SortableBindingList<BookmarkObject>(_files);
+            tssl_Status.Text="OK";
+            tssl_Count.Text = dataGridView1.Rows.Count.ToString();
+                statusStrip1.Refresh();
         }
 
         private void btn_Exit_Click(object sender, EventArgs e)
@@ -182,6 +196,10 @@ namespace BookmarkManager
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            __openFile();
+        }
+        private void __openFile()
+        {
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Multiselect = true;
             if (ofd.ShowDialog() == DialogResult.OK)
@@ -190,25 +208,48 @@ namespace BookmarkManager
                 {
                     try
                     {
-                        toolStripStatusLabel1.Text = string.Format("Loading {0}", fileName);
+                        tssl_Status.Text = string.Format("Loading {0}", fileName);
                         statusStrip1.Refresh();
                         string file = File.ReadAllText(fileName);
                         file = __stripNetscapeHeader(file);
                         XElement bookmarks = __changeToXML(file);
                         __readBookmarks(bookmarks);
+                        tssl_Status.Text = "OK";
+                        statusStrip1.Refresh();
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine(DateTime.Now + ex.Message + fileName);
                     }
-                }
-
-                toolStripStatusLabel1.Text = "Writing to the grid";
-                statusStrip1.Refresh();
-                __writeToGrid();
-                toolStripStatusLabel1.Text = string.Empty;
-                statusStrip1.Refresh();
+                }                
+                __writeToGrid();                
+                
             }
+        }
+
+        private void addFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            __openFile();
+        }
+
+        private void __dataTable(XElement x) { 
+        
+         string _addDate;
+         Image _icon;
+         string _iconString;
+         string _lastModified;
+         string _name;
+         string _parent;
+         string _path;
+         string _url;
+        //shown: icon | title | path | good/bad | url | addDate
+            //hidden: lastmodified
+            //don't need: parent | iconstring
+
+         DataTable dt = new DataTable();
+         dt.Columns.Add("Icon", typeof(Image));
+         dt.Columns.Add("Title", typeof(string));
+
         }
     }
 }

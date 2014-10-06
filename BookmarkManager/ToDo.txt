@@ -1,4 +1,9 @@
-﻿Grid
+﻿next:
+	change to read file directly into datatable;
+	rewrite remove dups to accommodate this change
+
+
+Grid
 	add
 	edit
 	delete
