@@ -28,61 +28,64 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.panel1 = new System.Windows.Forms.Panel();
+            this.components = new System.ComponentModel.Container();
             this.rtb_Text = new System.Windows.Forms.RichTextBox();
-            this.btn_Exit = new System.Windows.Forms.Button();
-            this.panel1.SuspendLayout();
+            this.cms_RightClick = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.tsmi_Hide = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmi_Clear = new System.Windows.Forms.ToolStripMenuItem();
+            this.cms_RightClick.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // panel1
-            // 
-            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel1.Controls.Add(this.rtb_Text);
-            this.panel1.Location = new System.Drawing.Point(12, 12);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(477, 445);
-            this.panel1.TabIndex = 0;
             // 
             // rtb_Text
             // 
+            this.rtb_Text.ContextMenuStrip = this.cms_RightClick;
             this.rtb_Text.Dock = System.Windows.Forms.DockStyle.Fill;
             this.rtb_Text.Location = new System.Drawing.Point(0, 0);
             this.rtb_Text.Name = "rtb_Text";
-            this.rtb_Text.Size = new System.Drawing.Size(477, 445);
+            this.rtb_Text.Size = new System.Drawing.Size(501, 498);
             this.rtb_Text.TabIndex = 0;
             this.rtb_Text.Text = "";
             // 
-            // btn_Exit
+            // cms_RightClick
             // 
-            this.btn_Exit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btn_Exit.Location = new System.Drawing.Point(414, 463);
-            this.btn_Exit.Name = "btn_Exit";
-            this.btn_Exit.Size = new System.Drawing.Size(75, 23);
-            this.btn_Exit.TabIndex = 1;
-            this.btn_Exit.Text = "Exit";
-            this.btn_Exit.UseVisualStyleBackColor = true;
-            this.btn_Exit.Click += new System.EventHandler(this.btn_Exit_Click);
+            this.cms_RightClick.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsmi_Clear,
+            this.tsmi_Hide});
+            this.cms_RightClick.Name = "cms_RightClick";
+            this.cms_RightClick.Size = new System.Drawing.Size(102, 48);
+            // 
+            // tsmi_Hide
+            // 
+            this.tsmi_Hide.Name = "tsmi_Hide";
+            this.tsmi_Hide.Size = new System.Drawing.Size(152, 22);
+            this.tsmi_Hide.Text = "Hide";
+            this.tsmi_Hide.Click += new System.EventHandler(this.tsmi_Hide_Click);
+            // 
+            // tsmi_Clear
+            // 
+            this.tsmi_Clear.Name = "tsmi_Clear";
+            this.tsmi_Clear.Size = new System.Drawing.Size(152, 22);
+            this.tsmi_Clear.Text = "Clear";
+            this.tsmi_Clear.Click += new System.EventHandler(this.tsmi_Clear_Click);
             // 
             // TextBoxPop
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(501, 498);
-            this.Controls.Add(this.btn_Exit);
-            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.rtb_Text);
             this.Name = "TextBoxPop";
             this.Text = "TextBoxPop";
-            this.panel1.ResumeLayout(false);
+            this.cms_RightClick.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.RichTextBox rtb_Text;
-        private System.Windows.Forms.Button btn_Exit;
+        private System.Windows.Forms.ContextMenuStrip cms_RightClick;
+        private System.Windows.Forms.ToolStripMenuItem tsmi_Clear;
+        private System.Windows.Forms.ToolStripMenuItem tsmi_Hide;
     }
 }

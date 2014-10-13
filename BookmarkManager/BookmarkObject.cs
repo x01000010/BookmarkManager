@@ -80,20 +80,28 @@ namespace BookmarkManager
             return Math.Floor(diff.TotalSeconds);
         }
 
-        public Image Base64ToImage(string base64String)
+        public static Image Base64ToImage(string base64String)
         {
-            // Convert Base64 String to byte[]
-            byte[] imageBytes = Convert.FromBase64String(base64String);
-            using (var ms = new MemoryStream(imageBytes, 0, imageBytes.Length))
+            Image icon = null;
+            if (!string.IsNullOrEmpty(base64String))
             {
-                // Convert byte[] to Image
-                ms.Write(imageBytes, 0, imageBytes.Length);
-                Image image = Image.FromStream(ms, true);
-                return image;
+                string imageString = base64String.Substring(base64String.IndexOf(",") + 1);
+                try
+                {
+                    byte[] imageBytes = Convert.FromBase64String(imageString);
+                    using (var ms = new MemoryStream(imageBytes, 0, imageBytes.Length))
+                    {
+                        ms.Write(imageBytes, 0, imageBytes.Length);
+                        icon = Image.FromStream(ms, true);
+                    }
+                }
+                catch { }
             }
+
+            return icon;
         }
 
-        public string ImageToBase64(Image image,
+        public static string ImageToBase64(Image image,
   System.Drawing.Imaging.ImageFormat format)
         {
             using (MemoryStream ms = new MemoryStream())
